@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="photo">
+
+   <!-- 전체조회 -> selectList -->
+   <select id="photo_list"  resultType="photo">
+     	select * from photo order by p_idx desc
+   </select>
+   
+   <!-- Paging별 조회 			변수 2개 이상일 때 Map으로 넘겨주기	 -->
+   <select id="photo_list_page" parameterType="Map" resultType="photo">
+    select * from
+	 (
+	 select
+	 	rank() over(order by p_idx desc) as no,
+	 	p.*
+	 from
+	 	(select * from photo) p
+	 )                             
+	 where no between #{start} and #{end}
+	 				<!-- Map의 키 값 -->
+   </select>
+   
+   <!-- 전체 레코드 수 구하기(전체 게시물 수) -->
+   <select id="photo_row_total" resultType="int">
+   		select nvl(count(*),0) from photo
+   		<!-- nvl = null value -> 값이 없을 경우 -->
+   </select>
+   
+   
+   <select id="photo_one" parameterType="int" resultType="photo">
+   		select * from photo where p_idx=#{p_idx}
+   </select>
+   
+   <insert id="photo_insert" parameterType="photo">
+   		insert into photo values(seq_photo_idx.nextVal,#{p_title},#{p_content},#{p_filename},#{p_ip},sysdate,#{mem_idx},#{mem_name})
+   </insert>
+   
+   <delete id="photo_delete" parameterType="int">
+   		delete from photo where p_idx=#{p_idx}
+   </delete>
+   
+   <update id="photo_update_filename" parameterType="photo">
+   		update photo set p_filename=#{p_filename} where p_idx=#{p_idx}
+   </update>
+   
+   <update id="photo_update" parameterType="photo">
+  		 update photo set p_title=#{p_title},p_content=#{p_content},p_ip=#{p_ip},p_regdate=sysdate where p_idx=#{p_idx}
+   </update>
+
+   
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
